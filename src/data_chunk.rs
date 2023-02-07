@@ -3,6 +3,7 @@ use crate::duckly::{
     duckdb_data_chunk_get_size, duckdb_data_chunk_get_vector, duckdb_data_chunk_reset,
     duckdb_data_chunk_set_size, duckdb_destroy_data_chunk, duckdb_logical_type, idx_t,
 };
+use crate::vector::ListVector;
 use crate::{LogicalType, Vector};
 
 /// A Data Chunk represents a set of vectors.
@@ -52,6 +53,13 @@ impl DataChunk {
     pub fn get_vector<T>(&self, column_index: idx_t) -> Vector<T> {
         Vector::from(unsafe { duckdb_data_chunk_get_vector(self.ptr, column_index) })
     }
+
+    pub fn get_list_vector(&self, column_index: idx_t) -> ListVector {
+        ListVector::from(unsafe {
+             duckdb_data_chunk_get_vector(self.ptr, column_index)
+        })
+    }
+
     /// Sets the current number of tuples in a data chunk.
     pub fn set_size(&self, size: idx_t) {
         unsafe { duckdb_data_chunk_set_size(self.ptr, size) };
