@@ -29,7 +29,7 @@ pub use crate::data_chunk::DataChunk;
 pub use crate::database::Database;
 pub use crate::logical_type::LogicalType;
 pub use crate::value::Value;
-pub use crate::vector::Vector;
+pub use crate::vector::{Vector, ListVector};
 
 use crate::duckly::duckdb_malloc;
 
