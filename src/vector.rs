@@ -1,6 +1,6 @@
 use crate::{
     duckly::{
-        duckdb_validity_row_is_valid, duckdb_validity_set_row_invalid,
+        duckdb_list_vector_get_size, duckdb_validity_row_is_valid, duckdb_validity_set_row_invalid,
         duckdb_validity_set_row_valid, duckdb_validity_set_row_validity, duckdb_vector,
         duckdb_vector_assign_string_element, duckdb_vector_assign_string_element_len,
         duckdb_vector_ensure_validity_writable, duckdb_vector_get_column_type,
@@ -68,6 +68,7 @@ impl<T> Vector<T> {
     pub fn get_column_type(&self) -> LogicalType {
         unsafe { LogicalType::from(duckdb_vector_get_column_type(self.0)) }
     }
+
     /// Retrieves the validity mask pointer of the specified vector.
     ///
     /// If all values are valid, this function MIGHT return NULL!
@@ -84,11 +85,29 @@ impl<T> Vector<T> {
     pub fn get_validity(&self) -> ValidityMask {
         unsafe { ValidityMask(duckdb_vector_get_validity(self.0), duckdb_vector_size()) }
     }
+
     /// Ensures the validity mask is writable by allocating it.
     ///
     /// After this function is called, get_validity will ALWAYS return non-NULL. This allows null values to be written to the vector, regardless of whether a validity mask was present before.
     pub fn ensure_validity_writable(&self) {
         unsafe { duckdb_vector_ensure_validity_writable(self.0) };
+    }
+}
+
+/// ListVector supports.
+pub struct ListVector {
+    ptr: duckdb_vector,
+}
+
+impl From<duckdb_vector> for ListVector {
+    fn from(ptr: duckdb_vector) -> Self {
+        Self { ptr }
+    }
+}
+
+impl ListVector {
+    pub fn len(&self) -> usize {
+        unsafe { duckdb_list_vector_get_size(self.ptr) as usize }
     }
 }
 
